@@ -17,6 +17,7 @@ let input_description=document.getElementById('event-description');
 let input_number=document.getElementById('event-seats');
 let input_price=document.getElementById('event-price');
 let btn_reset=document.getElementById('btn_reset');
+let image_event=document.getElementById('image_event');
 //logic for changing the screen
 btns_sidebar.forEach(btn=>
     btn.addEventListener('click',function(){   
@@ -80,7 +81,15 @@ formulaire.addEventListener('submit',(e)=>{
         
 })
 btn_reset.addEventListener('click',function(){
+    image_event.style.display="none";
     formulaire.reset();
 })
-
+// logic pour afficher une image lorsque l'ajout d'un url
+input_image.addEventListener('change',(e)=>{
+    input_value=e.currentTarget.value;
+    if(!input_value==""){
+        image_event.style.display="block";
+        image_event.src=input_value;
+    }
+})
     

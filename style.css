@@ -306,6 +306,13 @@ textarea.input {
   gap: var(--spacing-md);
   margin-top: var(--spacing-xl);
 }
+/* style for image */
+#image_event{
+  display: none;
+  width: 60%;
+  margin: 0 auto;
+  border-radius: 15px;
+}
 
 /* ============================================
    BUTTONS
