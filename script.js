@@ -69,13 +69,15 @@ formulaire.addEventListener('submit',(e)=>{
         console.log(event);
         console.log(nouveauEvent);
         //total seats
-        const total_seats=event.reduce((total_event,nbr)=>{
-            return total_event+nbr.number
+        const total_seats=event.reduce((total_event,ev)=>{
+            return total_event+ev.number
         } ,0)
         console.log(total_seats);
         seats_event.innerHTML=total_seats;
+        // total théorique 
+        const total_price=event.reduce((total_price,ev)=>{return total_price+ev.price},0)
+        total_price_event.innerHTML=`${total_price} $`;
         
-          
 })
 btn_reset.addEventListener('click',function(){
     formulaire.reset();
