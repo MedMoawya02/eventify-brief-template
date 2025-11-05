@@ -18,6 +18,15 @@ let input_number=document.getElementById('event-seats');
 let input_price=document.getElementById('event-price');
 let btn_reset=document.getElementById('btn_reset');
 let image_event=document.getElementById('image_event');
+//data for variant section
+let btn_add_variant=document.getElementById("btn-add-variant");
+let variants_list=document.getElementById("variants-list");
+/* let variants_row=document.querySelectorAll("#variants-list .variant-row"); */
+/* let btn_variant_row_remove=document.querySelectorAll('#variants-list .variant-row .variant-row__remove'); */
+
+
+
+
 //logic for changing the screen
 btns_sidebar.forEach(btn=>
     btn.addEventListener('click',function(){   
@@ -93,3 +102,31 @@ input_image.addEventListener('change',(e)=>{
     }
 })
     
+//variant logic
+btn_add_variant.addEventListener('click',()=>{
+    variants_list.innerHTML+=`<div class="variant-row">
+                                        <input type="text" class="input variant-row__name" placeholder="Variant name (e.g., 'Early Bird')" />
+                                        <input type="number" class="input variant-row__qty" placeholder="Qty" min="1" />
+                                        <input type="number" class="input variant-row__value" placeholder="Value" step="0.01" />
+                                        <select class="select variant-row__type">
+                                            <option value="fixed">Fixed Price</option>
+                                            <option value="percentage">Percentage Off</option>
+                                        </select>
+                                        <button type="button" class="btn btn--danger btn--small variant-row__remove">Remove</button>
+                                    </div>`
+    
+    //logic pour supprimer un rowo                                
+    const variants_row=document.querySelectorAll("#variants-list .variant-row");  
+    variants_row.forEach(row=>{
+    const btn_variant_row_remove=row.querySelector('.variant-row .variant-row__remove');  
+    btn_variant_row_remove.addEventListener('click',function(){
+    row.remove();
+    }) })
+})
+                                
+                              
+                                
+                           
+                               
+
+
