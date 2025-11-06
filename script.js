@@ -1,5 +1,5 @@
 //get data
-let event=[];
+let events=[];
 let archive=[];
 let btns_sidebar=document.querySelectorAll('.sidebar__btn');
 let screens=document.querySelectorAll('.screen');
@@ -21,9 +21,10 @@ let image_event=document.getElementById('image_event');
 //data for variant section
 let btn_add_variant=document.getElementById("btn-add-variant");
 let variants_list=document.getElementById("variants-list");
-/* let variants_row=document.querySelectorAll("#variants-list .variant-row"); */
-/* let btn_variant_row_remove=document.querySelectorAll('#variants-list .variant-row .variant-row__remove'); */
 
+//data for table(page3)
+let list_section=document.getElementById('event_list_section');
+let table_body=document.querySelector('.table__body');
 
 
 
@@ -69,23 +70,23 @@ formulaire.addEventListener('submit',(e)=>{
         number:parseInt(input_number.value),
         price:parseFloat(input_price.value)
     }
-    event.push(nouveauEvent);
+    events.push(nouveauEvent);
     //logic for:
         //Afficher les chiffres calculés depuis le tableau JS :
         //total d’événements
         //total de places
         //total théorique (somme des prix)
-        total_event.innerHTML=event.length;
-        console.log(event);
+        total_event.innerHTML=events.length;
+        console.log(events);
         console.log(nouveauEvent);
         //total seats
-        const total_seats=event.reduce((total_event,ev)=>{
+        const total_seats=events.reduce((total_event,ev)=>{
             return total_event+ev.number
         } ,0)
         console.log(total_seats);
         seats_event.innerHTML=total_seats;
         // total théorique 
-        const total_price=event.reduce((total_price,ev)=>{return total_price+ev.price},0)
+        const total_price=events.reduce((total_price,ev)=>{return total_price+ev.price},0)
         total_price_event.innerHTML=`${total_price} $`;
         
 })
@@ -115,7 +116,7 @@ btn_add_variant.addEventListener('click',()=>{
                                         <button type="button" class="btn btn--danger btn--small variant-row__remove">Remove</button>
                                     </div>`
     
-    //logic pour supprimer un rowo                                
+    //logic pour supprimer un row                               
     const variants_row=document.querySelectorAll("#variants-list .variant-row");  
     variants_row.forEach(row=>{
     const btn_variant_row_remove=row.querySelector('.variant-row .variant-row__remove');  
@@ -123,10 +124,27 @@ btn_add_variant.addEventListener('click',()=>{
     row.remove();
     }) })
 })
-                                
-                              
-                                
-                           
+
+
+//logique pour le list des evenement(page3)
+btns_sidebar[2].addEventListener('click',()=>{
+     table_body.innerHTML=`${events.map((e,index)=>`
+            <tr>
+                <td>${index+1}</td>
+                <td>${e.title}</td>
+                <td>${e.number}</td>
+                <td>${e.price}</td>
+                <td>
+                    <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
+                    <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
+                    <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
+                </td>  
+            </tr>
+        `)}`
+})
+    
+
+   
                                
 
 
