@@ -26,6 +26,8 @@ let variants_list=document.getElementById("variants-list");
 let list_section=document.getElementById('event_list_section');
 let table_body=document.querySelector('.table__body');
 
+let search_bar=document.getElementById('search-events');
+
 
 
 //logic for changing the screen
@@ -34,25 +36,43 @@ btns_sidebar.forEach(btn=>
         btns_sidebar.forEach(b=>b.classList.remove('is-active'));
         btn.classList.add('is-active');
         if(btn==btns_sidebar[1]){
-            screens[0].classList.remove("is-visible");
+            /* screens[0].classList.remove("is-visible");
+            screens[2].classList.remove("is-visible");
+            screens[3].classList.remove("is-visible");
+            screens[1].classList.add("is-visible"); */
+            screens.forEach(screen=>{
+                screen.classList.remove('is-visible');
+            })
             screens[1].classList.add("is-visible");
         }
         if(btn==btns_sidebar[2]){
-            screens[0].classList.remove("is-visible");
+            /* screens[0].classList.remove("is-visible");
             screens[1].classList.remove("is-visible");
+            screens[2].classList.add("is-visible"); */
+             screens.forEach(screen=>{
+                screen.classList.remove('is-visible');
+            })
             screens[2].classList.add("is-visible");
         }
         if(btn==btns_sidebar[3]){
-            screens[0].classList.remove("is-visible");
+            /* screens[0].classList.remove("is-visible");
             screens[1].classList.remove("is-visible");
             screens[2].classList.remove("is-visible");
+            screens[3].classList.add("is-visible"); */
+             screens.forEach(screen=>{
+                screen.classList.remove('is-visible');
+            })
             screens[3].classList.add("is-visible");
         }
          if(btn==btns_sidebar[0]){
-            screens[0].classList.add("is-visible");
+           /*  screens[0].classList.add("is-visible");
             screens[1].classList.remove("is-visible");
             screens[2].classList.remove("is-visible");
-            screens[3].classList.remove("is-visible");
+            screens[3].classList.remove("is-visible"); */
+             screens.forEach(screen=>{
+                screen.classList.remove('is-visible');
+            })
+            screens[0].classList.add("is-visible");
         }
         
     })
@@ -71,6 +91,7 @@ formulaire.addEventListener('submit',(e)=>{
         price:parseFloat(input_price.value)
     }
     events.push(nouveauEvent);
+
     //logic for:
         //Afficher les chiffres calculés depuis le tableau JS :
         //total d’événements
@@ -116,7 +137,7 @@ btn_add_variant.addEventListener('click',()=>{
                                         <button type="button" class="btn btn--danger btn--small variant-row__remove">Remove</button>
                                     </div>`
     
-    //logic pour supprimer un row                               
+    //logic pour supprimer un variant                               
     const variants_row=document.querySelectorAll("#variants-list .variant-row");  
     variants_row.forEach(row=>{
     const btn_variant_row_remove=row.querySelector('.variant-row .variant-row__remove');  
@@ -126,24 +147,55 @@ btn_add_variant.addEventListener('click',()=>{
 })
 
 
+
+//Page 3
 //logique pour le list des evenement(page3)
 btns_sidebar[2].addEventListener('click',()=>{
-     table_body.innerHTML=`${events.map((e,index)=>`
-            <tr>
-                <td>${index+1}</td>
-                <td>${e.title}</td>
-                <td>${e.number}</td>
-                <td>${e.price}</td>
-                <td>
-                    <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
-                    <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
-                    <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
-                </td>  
-            </tr>
-        `)}`
+    table_body.innerHTML=events.map((e,index)=>`
+        <tr class="table__row">
+        <td>${index+1}</td>
+        <td class="table__title">${e.title}</td>
+        <td>${e.number}</td>
+        <td>${e.price}</td>
+        <td></td>
+        <td class="btns_form_actions">
+        <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
+        <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
+        <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
+        </td>  
+        </tr>`).join("");
+        
+        //logique pour effacer une evenement depuis la liste
+        let rows=document.querySelectorAll('.table__row');
+        rows.forEach((row,index)=>{
+            const  delete_btn=row.querySelector('.btns_form_actions [data-action="archive"]');   
+            delete_btn.addEventListener('click',()=>{
+                row.remove();
+            }      
+            )
+        })    
+    })
+// logique pour faire un recherche 
+search_bar.addEventListener('input',(e)=>{
+    let rows=document.querySelectorAll('.table__body .table__row');
+    let input=e.target.value.toLowerCase();
+    rows.forEach(row=>{
+        const title_element=row.querySelector('.table__title');
+        if(!title_element){return;}
+        const title_content=title_element.textContent.toLowerCase();
+       
+        if(title_content.includes(input)){
+            row.style.display="table-row";
+        }else{
+            row.style.display="none";
+        }
+         
+    })
+   
+    
+    
 })
     
-
    
                                
 
