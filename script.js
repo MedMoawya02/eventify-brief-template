@@ -18,6 +18,9 @@ let input_number = document.getElementById('event-seats');
 let input_price = document.getElementById('event-price');
 let btn_reset = document.getElementById('btn_reset');
 let image_event = document.getElementById('image_event');
+let select = document.querySelector('#sort-events');
+
+
 //data for variant section
 let btn_add_variant = document.getElementById("btn-add-variant");
 let variants_list = document.getElementById("variants-list");
@@ -27,6 +30,7 @@ let list_section = document.getElementById('event_list_section');
 let table_body = document.querySelector('.table__body');
 let search_bar = document.getElementById('search-events');
 let rows = document.querySelectorAll('.table__row');
+
 //data for modal
 let modal_section = document.getElementById('event-modal');
 let modal_body = document.getElementById('modal-body');
@@ -184,7 +188,7 @@ btns_sidebar[2].addEventListener('click', () => {
     rows.forEach(row => {
         let btn_of_modification = row.querySelector('[data-action="edit"]');
         let table_td = row.querySelectorAll('td');
-        
+
 
         btn_of_modification.addEventListener('click', () => {
             modal_section.classList.remove('is-hidden');
@@ -209,20 +213,20 @@ btns_sidebar[2].addEventListener('click', () => {
                 </div>
             `;
 
-            let btn_modification=document.getElementById('btn_modification');
-            btn_modification.addEventListener('click',()=>{
-                table_td[1].textContent=document.getElementById('event-new-title').value;
-                table_td[2].textContent=document.getElementById('event-new-seats').value;
-                table_td[3].textContent=document.getElementById('event-new-price').value;
-                modal_section.classList.add('is-hidden');
-            })
+        let btn_modification = document.getElementById('btn_modification');
+        btn_modification.addEventListener('click', () => {
+            table_td[1].textContent = document.getElementById('event-new-title').value;
+            table_td[2].textContent = document.getElementById('event-new-seats').value;
+            table_td[3].textContent = document.getElementById('event-new-price').value;
+            modal_section.classList.add('is-hidden');
+        })
     })
     //logique pour fermer le modal
     close_modal.addEventListener('click', () => {
         modal_section.classList.add('is-hidden');
     })
     // When the user clicks anywhere outside of the modal, close it
-    window.addEventListener('click',function (event) {
+    window.addEventListener('click', function (event) {
         if (event.target == modal_section) {
             modal_section.classList.add('is-hidden');
         }
@@ -249,6 +253,193 @@ search_bar.addEventListener('input', (e) => {
     })
 })
 
+
+//logique pour trier le tablaeu
+select.addEventListener('change', (e) => {
+    let option_selected = e.target.value;
+    let options = document.querySelectorAll("#sort-events option");
+    // trier par seats 
+    /* events.sort((a,b)=>a.number - b.number);
+    console.log(events); */
+
+    //tri par seats sans utiliser sort();
+    if (options[4].value == option_selected) {
+        function triSeatBublleSort(evenement) {
+            let n = evenement.length;
+            let finished;
+            do {
+                finished = false;
+                for (let i = 0; i < n - 1; i++) {
+                    if (evenement[i].number > evenement[i + 1].number) {
+                        let temp = evenement[i];
+                        evenement[i] = evenement[i + 1];
+                        evenement[i + 1] = temp;
+                        finished = true
+                    }
+                }
+            } while (finished);
+            return evenement;
+        }
+        const eventsTries = triSeatBublleSort(events);
+        console.log(eventsTries);
+        table_body.innerHTML = events.map((e, index) => `
+            <tr class="table__row">
+            <td>${index + 1}</td>
+            <td class="table__title">${e.title}</td>
+            <td>${e.number}</td>
+            <td>${e.price} $</td>
+            <td></td>
+            <td class="btns_form_actions">
+            <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
+            <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
+            <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
+            </td>  
+            </tr>`).join("");
+    }
+
+
+    //tri par title aesc sans utiliser sort();
+    if (options[0].value == option_selected) {
+        function triTitleAescBublleSort(evenement) {
+            let n = evenement.length;
+            let finished;
+            do {
+                finished = false;
+                for (let i = 0; i < n - 1; i++) {
+                    if (evenement[i].title > evenement[i + 1].title) {
+                        let temp = evenement[i];
+                        evenement[i] = evenement[i + 1];
+                        evenement[i + 1] = temp;
+
+                        finished = true
+
+                    }
+                }
+            } while (finished);
+            return evenement;
+        }
+        const eventsTries = triTitleAescBublleSort(events);
+        console.log(eventsTries);
+        table_body.innerHTML = events.map((e, index) => `
+            <tr class="table__row">
+            <td>${index + 1}</td>
+            <td class="table__title">${e.title}</td>
+            <td>${e.number}</td>
+            <td>${e.price} $</td>
+            <td></td>
+            <td class="btns_form_actions">
+            <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
+            <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
+            <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
+            </td>  
+            </tr>`).join("");
+    }
+
+
+    //tri par title desc sans utiliser sort();
+    if (options[1].value == option_selected) {
+        function triTitleDescBublleSort(evenement) {
+            let n = evenement.length;
+            let finished;
+            do {
+                finished = false;
+                for (let i = 0; i < n - 1; i++) {
+                    if (evenement[i].title < evenement[i + 1].title) {
+                        let temp = evenement[i];
+                        evenement[i] = evenement[i + 1];
+                        evenement[i + 1] = temp;
+                        finished = true
+                    }
+                }
+            } while (finished);
+            return evenement;
+        }
+        const eventsTries = triTitleDescBublleSort(events);
+        console.log(eventsTries);
+        table_body.innerHTML = events.map((e, index) => `
+            <tr class="table__row">
+            <td>${index + 1}</td>
+            <td class="table__title">${e.title}</td>
+            <td>${e.number}</td>
+            <td>${e.price} $</td>
+            <td></td>
+            <td class="btns_form_actions">
+            <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
+            <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
+            <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
+            </td>  
+            </tr>`).join("");
+    }
+
+
+    //Tri price par ordre croissant
+    if (options[2].value == option_selected) {
+        function TriPriceAescBublleSort(evenement) {
+            let n = evenement.length;
+            let finished;
+            do {
+                finished = false;
+                for (let i = 0; i < n - 1; i++) {
+                    if (evenement[i].price > evenement[i+1].price) {
+                        let temp = evenement[i];
+                        evenement[i] = evenement[i + 1];
+                        evenement[i + 1] = temp;
+                        finished = true;
+                    }
+                }
+            } while (finished);
+            return evenement;
+        }
+        TriPriceAescBublleSort(events);
+        table_body.innerHTML = events.map((e, index) => `
+            <tr class="table__row">
+            <td>${index + 1}</td>
+            <td class="table__title">${e.title}</td>
+            <td>${e.number}</td>
+            <td>${e.price} $</td>
+            <td></td>
+            <td class="btns_form_actions">
+            <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
+            <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
+            <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
+            </td>  
+            </tr>`).join("");
+    }
+
+    //tri price par ordre dec
+    if (options[3].value == option_selected) {
+        function TriPriceDescBublleSort(evenement) {
+            let n = evenement.length;
+            let finished;
+            do {
+                finished = false;
+                for (let i = 0; i < n - 1; i++) {
+                    if (evenement[i].price < evenement[i+1].price) {
+                        let temp = evenement[i];
+                        evenement[i] = evenement[i + 1];
+                        evenement[i + 1] = temp;
+                        finished = true;
+                    }
+                }
+            } while (finished);
+            return evenement;
+        }
+        TriPriceDescBublleSort(events);
+        table_body.innerHTML = events.map((e, index) => `
+            <tr class="table__row">
+            <td>${index + 1}</td>
+            <td class="table__title">${e.title}</td>
+            <td>${e.number}</td>
+            <td>${e.price} $</td>
+            <td></td>
+            <td class="btns_form_actions">
+            <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
+            <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
+            <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
+            </td>  
+            </tr>`).join("");
+    }
+})
 
 
 
