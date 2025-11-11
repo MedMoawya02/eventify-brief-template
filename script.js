@@ -24,12 +24,19 @@ let select = document.querySelector('#sort-events');
 //data for variant section
 let btn_add_variant = document.getElementById("btn-add-variant");
 let variants_list = document.getElementById("variants-list");
-
+let variant_name = document.querySelector('.variant-row__name');
+let variant_qty = document.querySelector('.variant-row__qty');
+let variant_number = document.querySelector('.variant-row__value');
+let variant_type = document.querySelector('variant-row__type');
 //data for table(page3)
 let list_section = document.getElementById('event_list_section');
-let table_body = document.querySelector('.table__body');
+let table_body = document.querySelector('#events-table .table__body');
 let search_bar = document.getElementById('search-events');
 let rows = document.querySelectorAll('.table__row');
+
+
+//data for table(page4)
+let archive_section=document.querySelector('#archive-table .table__body')
 
 //data for modal
 let modal_section = document.getElementById('event-modal');
@@ -85,28 +92,15 @@ btns_sidebar.forEach(btn =>
 
 )
 
-//logic for form(add and clear (event section))
-formulaire.addEventListener('submit', (e) => {
-    e.preventDefault();
-    let nouveauEvent = {
-        title: input_title.value.toLowerCase(),
-        image: input_image.value,
-        description: input_description.value.toLowerCase(),
-        number: parseInt(input_number.value),
-        price: parseFloat(input_price.value)
-    }
-    events.push(nouveauEvent);
 
-    //logic for:
-    //Afficher les chiffres calculés depuis le tableau JS :
-    //total d’événements
-    //total de places
-    //total théorique (somme des prix)
+// fonction pour l'affichage et la mise à jour 
+function display(){
+    // afficher le nombre des events
     total_event.innerHTML = events.length;
     console.log(events);
-    console.log(nouveauEvent);
+    
 
-    //total seats
+    //afficher la somme des places 
     const total_seats = events.reduce((total_event, ev) => {
         return total_event + ev.number
     }, 0)
@@ -117,7 +111,90 @@ formulaire.addEventListener('submit', (e) => {
     const total_price = events.reduce((total_price, ev) => { return total_price + ev.price }, 0)
     total_price_event.innerHTML = `${total_price} $`;
 
+    //
+    table_body.innerHTML = events.map((e, index) => `
+        <tr class="table__row" data-index=${index}>
+        <td>${index + 1}</td>
+        <td class="table__title">${e.title}</td>
+        <td>${e.number}</td>
+        <td>${e.price} $</td>
+        <td><ul><li>${e.variant_title}</li><li>${e.variant_quantite}</li><li>${e.variant_price}$</li></ul></td>
+        <td class="btns_form_actions">
+        <button class="btn btn--small" data-action="details" data-event-id="${index}">Details</button>
+        <button class="btn btn--small" data-action="edit" data-event-id="${index}">Edit</button>
+        <button class="btn btn--danger btn--small" data-action="archive" data-event-id="${index}">Delete</button>
+        </td>  
+        </tr>`).join("");
+
+
+}
+
+
+//logic for form(add and clear (event section))
+formulaire.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let nouveauEvent = {
+        title: input_title.value.toLowerCase(),
+        image: input_image.value,
+        description: input_description.value.toLowerCase(),
+        number: parseInt(input_number.value),
+        price: parseFloat(input_price.value),
+        variant_title: variant_name.value,
+        variant_quantite: parseInt(variant_qty.value),
+        variant_price: parseFloat(variant_number.value),
+    }
+    console.log(nouveauEvent);
+    
+    events.push(nouveauEvent);
+    display();
+    //logic for:
+    //Afficher les chiffres calculés depuis le tableau JS :
+    //total d’événements
+    //total de places
+    //total théorique (somme des prix)
+    /* total_event.innerHTML = events.length;
+    console.log(events);
+    console.log(nouveauEvent); */
+
+    //total seats
+    /* const total_seats = events.reduce((total_event, ev) => {
+        return total_event + ev.number
+    }, 0)
+    console.log(total_seats);
+    seats_event.innerHTML = total_seats; */
+
+    /* // total théorique 
+    const total_price = events.reduce((total_price, ev) => { return total_price + ev.price }, 0)
+    total_price_event.innerHTML = `${total_price} $`; */
+
 })
+
+
+//logic du btn supprimer et pousser dans tableau archive:
+table_body.addEventListener('click',()=>{
+    let row=document.querySelectorAll('.table__row');
+    row.forEach(r=>{
+        let btn_delete=r.querySelector('[data-action="archive"]');
+        let index=Number(r.dataset.index);
+        btn_delete.addEventListener('click',()=>{
+            if(index!==-1){
+                let [event_supprimée]=events.splice(index,1);
+                archive.push(event_supprimée)
+                console.log(event_supprimée);
+                console.log("event supprimer de puis events et pousser vers archive");
+            }
+            display();
+        })
+        
+    })
+    
+    console.log(events);
+    console.log(archive);    
+    
+});
+
+
+
 //pour vider le formulaire
 btn_reset.addEventListener('click', function () {
     image_event.style.display = "none";
@@ -160,29 +237,7 @@ btn_add_variant.addEventListener('click', () => {
 //Page 3
 //logique pour le list des evenement(page3)
 btns_sidebar[2].addEventListener('click', () => {
-    table_body.innerHTML = events.map((e, index) => `
-        <tr class="table__row">
-        <td>${index + 1}</td>
-        <td class="table__title">${e.title}</td>
-        <td>${e.number}</td>
-        <td>${e.price} $</td>
-        <td></td>
-        <td class="btns_form_actions">
-        <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
-        <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
-        <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
-        </td>  
-        </tr>`).join("");
-
-    //logique pour effacer une evenement depuis la liste
-    let rows = document.querySelectorAll('.table__row');
-    rows.forEach(row => {
-        const delete_btn = row.querySelector('.btns_form_actions [data-action="archive"]');
-        delete_btn.addEventListener('click', () => {
-            row.remove();
-        }
-        )
-    })
+    display();
 
     //logique pour afficher le modal de modification
     rows.forEach(row => {
@@ -282,19 +337,7 @@ select.addEventListener('change', (e) => {
         }
         const eventsTries = triSeatBublleSort(events);
         console.log(eventsTries);
-        table_body.innerHTML = events.map((e, index) => `
-            <tr class="table__row">
-            <td>${index + 1}</td>
-            <td class="table__title">${e.title}</td>
-            <td>${e.number}</td>
-            <td>${e.price} $</td>
-            <td></td>
-            <td class="btns_form_actions">
-            <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
-            <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
-            <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
-            </td>  
-            </tr>`).join("");
+            display();
     }
 
 
@@ -320,19 +363,7 @@ select.addEventListener('change', (e) => {
         }
         const eventsTries = triTitleAescBublleSort(events);
         console.log(eventsTries);
-        table_body.innerHTML = events.map((e, index) => `
-            <tr class="table__row">
-            <td>${index + 1}</td>
-            <td class="table__title">${e.title}</td>
-            <td>${e.number}</td>
-            <td>${e.price} $</td>
-            <td></td>
-            <td class="btns_form_actions">
-            <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
-            <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
-            <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
-            </td>  
-            </tr>`).join("");
+        display();
     }
 
 
@@ -356,19 +387,7 @@ select.addEventListener('change', (e) => {
         }
         const eventsTries = triTitleDescBublleSort(events);
         console.log(eventsTries);
-        table_body.innerHTML = events.map((e, index) => `
-            <tr class="table__row">
-            <td>${index + 1}</td>
-            <td class="table__title">${e.title}</td>
-            <td>${e.number}</td>
-            <td>${e.price} $</td>
-            <td></td>
-            <td class="btns_form_actions">
-            <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
-            <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
-            <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
-            </td>  
-            </tr>`).join("");
+       display();
     }
 
 
@@ -380,7 +399,7 @@ select.addEventListener('change', (e) => {
             do {
                 finished = false;
                 for (let i = 0; i < n - 1; i++) {
-                    if (evenement[i].price > evenement[i+1].price) {
+                    if (evenement[i].price > evenement[i + 1].price) {
                         let temp = evenement[i];
                         evenement[i] = evenement[i + 1];
                         evenement[i + 1] = temp;
@@ -391,19 +410,7 @@ select.addEventListener('change', (e) => {
             return evenement;
         }
         TriPriceAescBublleSort(events);
-        table_body.innerHTML = events.map((e, index) => `
-            <tr class="table__row">
-            <td>${index + 1}</td>
-            <td class="table__title">${e.title}</td>
-            <td>${e.number}</td>
-            <td>${e.price} $</td>
-            <td></td>
-            <td class="btns_form_actions">
-            <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
-            <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
-            <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
-            </td>  
-            </tr>`).join("");
+        display();
     }
 
     //tri price par ordre dec
@@ -414,7 +421,7 @@ select.addEventListener('change', (e) => {
             do {
                 finished = false;
                 for (let i = 0; i < n - 1; i++) {
-                    if (evenement[i].price < evenement[i+1].price) {
+                    if (evenement[i].price < evenement[i + 1].price) {
                         let temp = evenement[i];
                         evenement[i] = evenement[i + 1];
                         evenement[i + 1] = temp;
@@ -425,22 +432,28 @@ select.addEventListener('change', (e) => {
             return evenement;
         }
         TriPriceDescBublleSort(events);
-        table_body.innerHTML = events.map((e, index) => `
-            <tr class="table__row">
-            <td>${index + 1}</td>
-            <td class="table__title">${e.title}</td>
-            <td>${e.number}</td>
-            <td>${e.price} $</td>
-            <td></td>
-            <td class="btns_form_actions">
-            <button class="btn btn--small" data-action="details" data-event-id="1">Details</button>
-            <button class="btn btn--small" data-action="edit" data-event-id="1">Edit</button>
-            <button class="btn btn--danger btn--small" data-action="archive" data-event-id="1">Delete</button>
-            </td>  
-            </tr>`).join("");
+        display();
     }
 })
 
 
+//logique pour afficher l'archive
+btns_sidebar[3].addEventListener('click',()=>{
 
+    archive_section.innerHTML=archive.map((a,index)=>
+        `
+        <tr class="table__row" data-index=${index}>
+        <td>${index + 1}</td>
+        <td class="table__title">${a.title}</td>
+        <td>${a.number}</td>
+        <td>${a.price} $</td>
+        <td class="btns_form_actions">
+        <button class="btn btn--danger btn--small" data-action="archive" data-event-id="${index}">Restore</button>
+        </td>  
+        </tr>
+    
+        `
+    )
+
+})
 
