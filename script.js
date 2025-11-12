@@ -20,7 +20,6 @@ let btn_reset = document.getElementById('btn_reset');
 let image_event = document.getElementById('image_event');
 let select = document.querySelector('#sort-events');
 
-
 //data for variant section
 let btn_add_variant = document.getElementById("btn-add-variant");
 let variants_list = document.getElementById("variants-list");
@@ -28,12 +27,12 @@ let variant_name = document.querySelector('.variant-row__name');
 let variant_qty = document.querySelector('.variant-row__qty');
 let variant_number = document.querySelector('.variant-row__value');
 let variant_type = document.querySelector('variant-row__type');
+
 //data for table(page3)
 let list_section = document.getElementById('event_list_section');
 let table_body = document.querySelector('#events-table .table__body');
 let search_bar = document.getElementById('search-events');
 let rows = document.querySelectorAll('.table__row');
-
 
 //data for table(page4)
 let archive_section=document.querySelector('#archive-table .table__body')
@@ -42,56 +41,6 @@ let archive_section=document.querySelector('#archive-table .table__body')
 let modal_section = document.getElementById('event-modal');
 let modal_body = document.getElementById('modal-body');
 let close_modal = document.querySelector('.modal__close');
-//logic for changing the screen
-btns_sidebar.forEach(btn =>
-    btn.addEventListener('click', function () {
-        btns_sidebar.forEach(b => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-        if (btn == btns_sidebar[1]) {
-            /* screens[0].classList.remove("is-visible");
-            screens[2].classList.remove("is-visible");
-            screens[3].classList.remove("is-visible");
-            screens[1].classList.add("is-visible"); */
-            screens.forEach(screen => {
-                screen.classList.remove('is-visible');
-            })
-            screens[1].classList.add("is-visible");
-        }
-        if (btn == btns_sidebar[2]) {
-            /* screens[0].classList.remove("is-visible");
-            screens[1].classList.remove("is-visible");
-            screens[2].classList.add("is-visible"); */
-            screens.forEach(screen => {
-                screen.classList.remove('is-visible');
-            })
-            screens[2].classList.add("is-visible");
-        }
-        if (btn == btns_sidebar[3]) {
-            /* screens[0].classList.remove("is-visible");
-            screens[1].classList.remove("is-visible");
-            screens[2].classList.remove("is-visible");
-            screens[3].classList.add("is-visible"); */
-            screens.forEach(screen => {
-                screen.classList.remove('is-visible');
-            })
-            screens[3].classList.add("is-visible");
-        }
-        if (btn == btns_sidebar[0]) {
-            /*  screens[0].classList.add("is-visible");
-             screens[1].classList.remove("is-visible");
-             screens[2].classList.remove("is-visible");
-             screens[3].classList.remove("is-visible"); */
-            screens.forEach(screen => {
-                screen.classList.remove('is-visible');
-            })
-            screens[0].classList.add("is-visible");
-        }
-
-    })
-
-
-)
-
 
 // fonction pour l'affichage et la mise à jour 
 function display(){
@@ -99,7 +48,6 @@ function display(){
     total_event.innerHTML = events.length;
     console.log(events);
     
-
     //afficher la somme des places 
     const total_seats = events.reduce((total_event, ev) => {
         return total_event + ev.number
@@ -125,10 +73,47 @@ function display(){
         <button class="btn btn--danger btn--small" data-action="archive" data-event-id="${index}">Delete</button>
         </td>  
         </tr>`).join("");
+};
 
-
-}
-
+//logic for changing the screen
+btns_sidebar.forEach(btn =>
+    btn.addEventListener('click', function () {
+        btns_sidebar.forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        if (btn == btns_sidebar[1]) {
+            /* screens[0].classList.remove("is-visible");
+            screens[2].classList.remove("is-visible");
+            screens[3].classList.remove("is-visible");
+            screens[1].classList.add("is-visible"); */
+            screens.forEach(screen => {
+                screen.classList.remove('is-visible');
+            })
+            screens[1].classList.add("is-visible");
+            display();
+        }
+        if (btn == btns_sidebar[2]) {
+            screens.forEach(screen => {
+                screen.classList.remove('is-visible');
+            })
+            screens[2].classList.add("is-visible");
+            display();
+        }
+        if (btn == btns_sidebar[3]) {
+            screens.forEach(screen => {
+                screen.classList.remove('is-visible');
+            })
+            screens[3].classList.add("is-visible");
+            display();
+        }
+        if (btn == btns_sidebar[0]) {
+            screens.forEach(screen => {
+                screen.classList.remove('is-visible');
+            })
+            screens[0].classList.add("is-visible");
+            display();
+        }
+    })
+)
 
 //logic for form(add and clear (event section))
 formulaire.addEventListener('submit', (e) => {
@@ -169,32 +154,61 @@ formulaire.addEventListener('submit', (e) => {
 
 })
 
-
 //logic du btn supprimer et pousser dans tableau archive:
-table_body.addEventListener('click',()=>{
-    let row=document.querySelectorAll('.table__row');
-    row.forEach(r=>{
-        let btn_delete=r.querySelector('[data-action="archive"]');
-        let index=Number(r.dataset.index);
-        btn_delete.addEventListener('click',()=>{
-            if(index!==-1){
-                let [event_supprimée]=events.splice(index,1);
-                archive.push(event_supprimée)
-                console.log(event_supprimée);
-                console.log("event supprimer de puis events et pousser vers archive");
-            }
+list_section.addEventListener('click',(e)=>{
+    //logique pour supprimer un event et pusser dans le tableau archive
+    if (e.target.dataset.action === "archive") {
+        const index = Number(e.target.dataset.eventId);
+        if (index !== -1) {
+            const [deletedEvent] = events.splice(index, 1);
+            archive.push(deletedEvent);
             display();
-        })
+        }
+    }
+    
+//logique pour modifier un evenemnt 
+    if(e.target.dataset.action==="edit"){
+        modal_section.classList.remove('is-hidden');
+        let index=Number(e.target.dataset.eventId);
+        let ev=events[index];
+        console.log(ev);
         
+        modal_body.innerHTML = `
+            <form id="edit_event_form">
+            
+            <div class="form__group">
+                <label class="form__label" for="event-title">Event Title</label>
+                <input type="text" id="event-new-title" class="input" value="${ev.title}">
+            </div>
+            <div class="form__group">
+                <label class="form__label" for="event-title">Event Seats</label>
+                <input type="text" id="event-new-seats" class="input" value="${ev.number}">
+            </div>
+            <div class="form__group">
+                <label class="form__label" for="event-title">Event Price</label>
+                <input type="text" id="event-new-price" class="input" value="${ev.price}">
+            </div>
+            <div class="form__group">
+                <button type="submit" class="btn btn--primary" id="btn_modification">Modifier</button>
+            </div>
+            </form>
+            `;
+            document.getElementById('edit_event_form').addEventListener('submit',(e)=>{
+                e.preventDefault();
+                ev.title=document.getElementById('event-new-title').value;
+                ev.number=Number(document.getElementById('event-new-seats').value);
+                ev.price=Number(document.getElementById('event-new-price').value);
+                console.log("element modifiéee");
+                modal_section.classList.add('is-hidden');
+                display();    
+            })
+            
+    };        
     })
     
     console.log(events);
     console.log(archive);    
     
-});
-
-
-
 //pour vider le formulaire
 btn_reset.addEventListener('click', function () {
     image_event.style.display = "none";
@@ -232,62 +246,11 @@ btn_add_variant.addEventListener('click', () => {
     })
 })
 
-
-
 //Page 3
 //logique pour le list des evenement(page3)
 btns_sidebar[2].addEventListener('click', () => {
     display();
-
-    //logique pour afficher le modal de modification
-    rows.forEach(row => {
-        let btn_of_modification = row.querySelector('[data-action="edit"]');
-        let table_td = row.querySelectorAll('td');
-
-
-        btn_of_modification.addEventListener('click', () => {
-            modal_section.classList.remove('is-hidden');
-            console.log(table_td);
-        });
-
-        modal_body.innerHTML = `
-                <div class="form__group">
-                    <label class="form__label" for="event-title">Event Title</label>
-                    <input type="text" id="event-new-title" class="input" value="${table_td[1].textContent}">
-                </div>
-                <div class="form__group">
-                    <label class="form__label" for="event-title">Event Seats</label>
-                    <input type="text" id="event-new-seats" class="input" value="${table_td[2].textContent}">
-                </div>
-                <div class="form__group">
-                    <label class="form__label" for="event-title">Event Price</label>
-                    <input type="text" id="event-new-price" class="input" value="${table_td[3].textContent}">
-                </div>
-                <div class="form__group">
-                    <button type="submit" class="btn btn--primary" id="btn_modification">Modifier</button>
-                </div>
-            `;
-
-        let btn_modification = document.getElementById('btn_modification');
-        btn_modification.addEventListener('click', () => {
-            table_td[1].textContent = document.getElementById('event-new-title').value;
-            table_td[2].textContent = document.getElementById('event-new-seats').value;
-            table_td[3].textContent = document.getElementById('event-new-price').value;
-            modal_section.classList.add('is-hidden');
-        })
-    })
-    //logique pour fermer le modal
-    close_modal.addEventListener('click', () => {
-        modal_section.classList.add('is-hidden');
-    })
-    // When the user clicks anywhere outside of the modal, close it
-    window.addEventListener('click', function (event) {
-        if (event.target == modal_section) {
-            modal_section.classList.add('is-hidden');
-        }
-    })
 })
-
 
 // logique pour faire un recherche 
 search_bar.addEventListener('input', (e) => {
@@ -436,7 +399,6 @@ select.addEventListener('change', (e) => {
     }
 })
 
-
 //logique pour afficher l'archive
 btns_sidebar[3].addEventListener('click',()=>{
 
@@ -448,12 +410,23 @@ btns_sidebar[3].addEventListener('click',()=>{
         <td>${a.number}</td>
         <td>${a.price} $</td>
         <td class="btns_form_actions">
-        <button class="btn btn--danger btn--small" data-action="archive" data-event-id="${index}">Restore</button>
+        <button class="btn btn--danger btn--small restore" data-action="archive" data-event-id="${index}">Restore</button>
         </td>  
         </tr>
     
         `
     )
 
+    //logique pour restorer un evenement vers tableau events
+    let btn_restore=document.querySelectorAll('.restore');
+    btn_restore.forEach(btn=>{
+        let index=btn.dataset.eventId;
+        btn.addEventListener('click',()=>{
+            let [restored]=archive.splice(index,1);
+            events.push(restored);
+            btns_sidebar[2].click();
+        })
+    })
+    display();
 })
 
