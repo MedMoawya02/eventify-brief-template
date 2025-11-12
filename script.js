@@ -1,6 +1,7 @@
 //get data
 let events = [];
 let archive = [];
+
 let btns_sidebar = document.querySelectorAll('.sidebar__btn');
 let screens = document.querySelectorAll('.screen');
 
@@ -35,7 +36,7 @@ let search_bar = document.getElementById('search-events');
 let rows = document.querySelectorAll('.table__row');
 
 //data for table(page4)
-let archive_section=document.querySelector('#archive-table .table__body')
+let archive_section = document.querySelector('#archive-table .table__body')
 
 //data for modal
 let modal_section = document.getElementById('event-modal');
@@ -43,17 +44,22 @@ let modal_body = document.getElementById('modal-body');
 let close_modal = document.querySelector('.modal__close');
 
 // fonction pour l'affichage et la mise à jour 
-function display(){
+function display() {
     // afficher le nombre des events
     total_event.innerHTML = events.length;
     console.log(events);
-    
+
     //afficher la somme des places 
-    const total_seats = events.reduce((total_event, ev) => {
+    /* const total_seats = events.reduce((total_event, ev) => {
         return total_event + ev.number
-    }, 0)
-    console.log(total_seats);
-    seats_event.innerHTML = total_seats;
+    }, 0) */
+    let sum=0;
+    for(let ev=0;ev<events.length;ev++){
+        sum+=Number(events[ev].number);
+    }
+    
+    console.log(sum);
+    seats_event.innerHTML = sum;
 
     // total théorique 
     const total_price = events.reduce((total_price, ev) => { return total_price + ev.price }, 0)
@@ -66,7 +72,9 @@ function display(){
         <td class="table__title">${e.title}</td>
         <td>${e.number}</td>
         <td>${e.price} $</td>
-        <td><ul><li>${e.variant_title}</li><li>${e.variant_quantite}</li><li>${e.variant_price}$</li></ul></td>
+        <td><ul>
+            ${e.variants.map(v=>`<li>${v.name}</li><li>${v.qty}</li><li>${v.value}</li>`)}
+        </ul></td>
         <td class="btns_form_actions">
         <button class="btn btn--small" data-action="details" data-event-id="${index}">Details</button>
         <button class="btn btn--small" data-action="edit" data-event-id="${index}">Edit</button>
@@ -118,44 +126,61 @@ btns_sidebar.forEach(btn =>
 //logic for form(add and clear (event section))
 formulaire.addEventListener('submit', (e) => {
     e.preventDefault();
+
+    //variant 
+    let variants=[];
+    const variant_rows=document.querySelectorAll('#variants-list .variant-row');
+    variant_rows.forEach(row=>{
+        let nouveau_variant={
+            name:row.querySelector('.variant-row__name').value,
+            qty:row.querySelector('.variant-row__qty').value,
+            value:row.querySelector('.variant-row__value').value,
+        };
+        variants.push(nouveau_variant);
+    })
+    console.log(variants);
+    
     let nouveauEvent = {
         title: input_title.value.toLowerCase(),
         image: input_image.value,
         description: input_description.value.toLowerCase(),
         number: parseInt(input_number.value),
         price: parseFloat(input_price.value),
-        variant_title: variant_name.value,
+        variants:variants,
+        /* variant_title: variant_name.value,
         variant_quantite: parseInt(variant_qty.value),
-        variant_price: parseFloat(variant_number.value),
+        variant_price: parseFloat(variant_number.value), */
     }
     console.log(nouveauEvent);
-    
+
     events.push(nouveauEvent);
     display();
-    //logic for:
-    //Afficher les chiffres calculés depuis le tableau JS :
-    //total d’événements
-    //total de places
-    //total théorique (somme des prix)
-    /* total_event.innerHTML = events.length;
-    console.log(events);
-    console.log(nouveauEvent); */
-
-    //total seats
-    /* const total_seats = events.reduce((total_event, ev) => {
-        return total_event + ev.number
-    }, 0)
-    console.log(total_seats);
-    seats_event.innerHTML = total_seats; */
-
-    /* // total théorique 
-    const total_price = events.reduce((total_price, ev) => { return total_price + ev.price }, 0)
-    total_price_event.innerHTML = `${total_price} $`; */
-
 })
 
 //logic du btn supprimer et pousser dans tableau archive:
-list_section.addEventListener('click',(e)=>{
+list_section.addEventListener('click', (e) => {
+
+    //logique pour afficher le detail de chaque event
+    if (e.target.dataset.action === "details") {
+        const index = Number(e.target.dataset.eventId);
+        const event_info = events[index];
+        modal_section.classList.remove('is-hidden');
+        modal_body.innerHTML = `
+        <div class="container mt-4">
+            <div class="card shadow-sm border-0 p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-primary pt-3">🎟️ ${event_info.title}</h5>
+                    <span class="badge bg-success mt-3 ">${event_info.price} $</span>
+                </div>
+                <p class="text-muted mb-0 mt-3">
+                    <i class="bi bi-people"></i> Places disponibles : <strong>${event_info.number}</strong>
+                </p>
+            </div>
+        </div>`;
+        close_modal.addEventListener('click',()=>{
+            modal_section.classList.add('is-hidden');
+        })
+    }
     //logique pour supprimer un event et pusser dans le tableau archive
     if (e.target.dataset.action === "archive") {
         const index = Number(e.target.dataset.eventId);
@@ -165,17 +190,18 @@ list_section.addEventListener('click',(e)=>{
             display();
         }
     }
-    
-//logique pour modifier un evenemnt 
-    if(e.target.dataset.action==="edit"){
+
+    //logique pour modifier un evenemnt 
+    if (e.target.dataset.action === "edit") {
         modal_section.classList.remove('is-hidden');
-        let index=Number(e.target.dataset.eventId);
-        let ev=events[index];
-        console.log(ev);
+        let index = Number(e.target.dataset.eventId);
+        let ev = events[index];
+        console.log(index);
         
+        console.log(ev);
+
         modal_body.innerHTML = `
             <form id="edit_event_form">
-            
             <div class="form__group">
                 <label class="form__label" for="event-title">Event Title</label>
                 <input type="text" id="event-new-title" class="input" value="${ev.title}">
@@ -193,22 +219,22 @@ list_section.addEventListener('click',(e)=>{
             </div>
             </form>
             `;
-            document.getElementById('edit_event_form').addEventListener('submit',(e)=>{
-                e.preventDefault();
-                ev.title=document.getElementById('event-new-title').value;
-                ev.number=Number(document.getElementById('event-new-seats').value);
-                ev.price=Number(document.getElementById('event-new-price').value);
-                console.log("element modifiéee");
-                modal_section.classList.add('is-hidden');
-                display();    
-            })
-            
-    };        
-    })
-    
-    console.log(events);
-    console.log(archive);    
-    
+        document.getElementById('edit_event_form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            ev.title = document.getElementById('event-new-title').value;
+            ev.number = Number(document.getElementById('event-new-seats').value);
+            ev.price = Number(document.getElementById('event-new-price').value);
+            console.log("element modifiéee");
+            modal_section.classList.add('is-hidden');
+            display();
+        })
+
+    };
+})
+
+console.log(events);
+console.log(archive);
+
 //pour vider le formulaire
 btn_reset.addEventListener('click', function () {
     image_event.style.display = "none";
@@ -300,7 +326,7 @@ select.addEventListener('change', (e) => {
         }
         const eventsTries = triSeatBublleSort(events);
         console.log(eventsTries);
-            display();
+        display();
     }
 
 
@@ -350,7 +376,7 @@ select.addEventListener('change', (e) => {
         }
         const eventsTries = triTitleDescBublleSort(events);
         console.log(eventsTries);
-       display();
+        display();
     }
 
 
@@ -400,9 +426,9 @@ select.addEventListener('change', (e) => {
 })
 
 //logique pour afficher l'archive
-btns_sidebar[3].addEventListener('click',()=>{
+btns_sidebar[3].addEventListener('click', () => {
 
-    archive_section.innerHTML=archive.map((a,index)=>
+    archive_section.innerHTML = archive.map((a, index) =>
         `
         <tr class="table__row" data-index=${index}>
         <td>${index + 1}</td>
@@ -418,11 +444,11 @@ btns_sidebar[3].addEventListener('click',()=>{
     )
 
     //logique pour restorer un evenement vers tableau events
-    let btn_restore=document.querySelectorAll('.restore');
-    btn_restore.forEach(btn=>{
-        let index=btn.dataset.eventId;
-        btn.addEventListener('click',()=>{
-            let [restored]=archive.splice(index,1);
+    let btn_restore = document.querySelectorAll('.restore');
+    btn_restore.forEach(btn => {
+        let index = btn.dataset.eventId;
+        btn.addEventListener('click', () => {
+            let [restored] = archive.splice(index, 1);
             events.push(restored);
             btns_sidebar[2].click();
         })
