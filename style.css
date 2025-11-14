@@ -310,6 +310,7 @@ textarea.input {
 #image_event{
   display: none;
   width: 60%;
+  height: 250px;
   margin: 0 auto;
   border-radius: 15px;
 }
